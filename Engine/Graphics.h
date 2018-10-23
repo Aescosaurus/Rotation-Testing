@@ -169,9 +169,12 @@ public:
 			{
 				for( int sx = srcRect.left; sx < srcRect.right; sx++ )
 				{
+					const Vei2 center = { x + s.GetWidth() / 2,y + s.GetHeight() / 2 };
 					Vei2 drawPos = { x + sx - srcRect.left,
 						y + sy - srcRect.top };
+					drawPos -= center;
 					drawPos = rotationMatrix * Vec2( drawPos );
+					drawPos += center;
 					effect(
 						// Mirror in x.
 						s.GetPixel( xOffset - sx,sy ),
