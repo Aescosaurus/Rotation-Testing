@@ -62,25 +62,12 @@ public:
 	}
 	Color& GetPixel( int x,int y ) const;
 	void PutPixel( int x,int y,Color c );
-	void PutPixel( int x,int y,Color c,unsigned char alpha );
-	void PutPixel( int x,int y,Color c,float alpha );
+	void PutPixelApprox( float x,float y,Color c );
+	void PutPixelAlpha( int x,int y,Color c,float alpha );
 	void DrawRect( int x,int y,int width,int height,Color c );
 	void DrawRectDim( int x1,int y1,int x2,int y2,Color c );
 	void DrawCircle( int x,int y,int radius,Color c );
-	void DrawLineOld( int x0,int y0,int x1,int y1,Color c );
 	void DrawLine( Vec2 p0,Vec2 p1,Color c );
-	template<typename R>
-	void DrawHitbox( const Rect_<R>& hitbox,Color c = { 255,160,0 } )
-	{
-		DrawLineOld( int( hitbox.left ),int( hitbox.top ),
-			int( hitbox.right ),int( hitbox.top ),c );
-		DrawLineOld( int( hitbox.right ),int( hitbox.top ),
-			int( hitbox.right ),int( hitbox.bottom ),c );
-		DrawLineOld( int( hitbox.right ),int( hitbox.bottom ),
-			int( hitbox.left ),int( hitbox.bottom ),c );
-		DrawLineOld( int( hitbox.left ),int( hitbox.bottom ),
-			int( hitbox.left ),int( hitbox.top ),c );
-	}
 	template<typename E>
 	void DrawSprite( int x,int y,const Surface& s,E effect,
 		const Mat& rotationMatrix = Mat::Rotation( 0.0f ),bool reversed = false )
@@ -129,11 +116,11 @@ public:
 				for( int sx = srcRect.left; sx < srcRect.right; sx++ )
 				{
 					const Vei2 center = { x + s.GetWidth() / 2,y + s.GetHeight() / 2 };
-					Vei2 drawPos = { x + sx - srcRect.left,
-						y + sy - srcRect.top };
-					drawPos -= center;
-					drawPos = rotationMatrix * Vec2( drawPos );
-					drawPos += center;
+					auto drawPos = Vec2( Vei2{ x + sx - srcRect.left,
+						y + sy - srcRect.top } );
+					drawPos -= Vec2( center );
+					drawPos = rotationMatrix * drawPos;
+					drawPos += Vec2( center );
 					effect(
 						// No mirroring!
 						s.GetPixel( sx,sy ),
@@ -170,11 +157,11 @@ public:
 				for( int sx = srcRect.left; sx < srcRect.right; sx++ )
 				{
 					const Vei2 center = { x + s.GetWidth() / 2,y + s.GetHeight() / 2 };
-					Vei2 drawPos = { x + sx - srcRect.left,
-						y + sy - srcRect.top };
-					drawPos -= center;
+					auto drawPos = Vec2( Vei2{ x + sx - srcRect.left,
+						y + sy - srcRect.top } );
+					drawPos -= Vec2( center );
 					drawPos = rotationMatrix * Vec2( drawPos );
-					drawPos += center;
+					drawPos += Vec2( center );
 					effect(
 						// Mirror in x.
 						s.GetPixel( xOffset - sx,sy ),
